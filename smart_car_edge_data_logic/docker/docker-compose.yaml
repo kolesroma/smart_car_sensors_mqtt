@@ -73,6 +73,7 @@ services:
     networks:
       mqtt_network:
       edge_hub:
+      hub_store:
 
   hub:
     container_name: hub

@@ -2,7 +2,7 @@ from app.entities.agent_data import AgentData
 from app.entities.processed_agent_data import ProcessedAgentData
 
 
-def process_agent_data(agent_data: AgentData,) -> ProcessedAgentData:
+def process_agent_data(agent_data: AgentData) -> ProcessedAgentData:
     """
     Process agent data and classify the state of the road surface.
     Parameters:
@@ -11,4 +11,5 @@ def process_agent_data(agent_data: AgentData,) -> ProcessedAgentData:
     processed_data (ProcessedAgentData): Processed data containing the classified state of
     the road surface and agent data.
     """
-    pass
+    return ProcessedAgentData(road_state="stable" if agent_data.accelerometer.z < 50 else "critic",
+                              agent_data=agent_data)

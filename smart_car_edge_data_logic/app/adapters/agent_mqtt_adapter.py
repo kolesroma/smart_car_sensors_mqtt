@@ -24,11 +24,16 @@ class AgentMQTTAdapter(AgentGateway):
 
     def on_message(self, client, userdata, msg):
         """Processing agent data and sent it to hub gateway"""
+        logging.info(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
         try:
-            payload: str = msg.payload.decode("utf-8")
+            payload: str = msg.payload.decode()
             agent_data = AgentData.model_validate_json(payload, strict=True)
             processed_data = process_agent_data(agent_data)
-            if not self.hub_gateway.save_data(processed_data):
+
+            json_processed_agent_data = processed_data.json()
+            json_processed_agent_data_batch = [json_processed_agent_data]
+
+            if not self.hub_gateway.save_data(processed_agent_data_batch=json_processed_agent_data_batch):
                 logging.error("Hub is not available")
         except Exception as e:
             logging.info(f"Error processing MQTT message: {e}")
@@ -36,7 +41,7 @@ class AgentMQTTAdapter(AgentGateway):
     def connect(self):
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.connect(self.broker_host, self.broker_port, 60)
+        self.client.connect(self.broker_host, self.broker_port)
 
     def start(self):
         self.client.loop_start()
